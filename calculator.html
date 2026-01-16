@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Calculator</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html,
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        font-size: 50px;
+      }
+      .calc {
+        border-radius: 10px;
+        width: 100%;
+        height: auto;
+      }
+      .calculator_display {
+        text-align: right;
+        font-size: 20px;
+        width: 100%;
+        padding: 20px;
+        outline: 1px solid black;
+        margin-bottom: 1px;
+        border: none;
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+      }
+      button {
+        font-size: 30px;
+        border: none;
+        outline: 1px solid grey;
+      }
+      .calculator_keys {
+        display: grid;
+        grid-template-columns: repeat(4, 100px);
+        grid-template-rows: 60px 60px 60px 60px 60px;
+        gap: 2px;
+      }
+      .calculator_keys > .key--equal {
+        grid-column-start: 4;
+        grid-row-start: 2;
+        grid-row: 2 / span 4;
+        background-color: orangered;
+      }
+    </style>
+  </head>
+  <body>
+    <section class="calc">
+      <input type="text" class="calculator_display" placeholder="Enter Number" value="0" disabled />
+      <div class="calculator_keys">
+        <button class="key--operator" data-action="addition">+</button>
+        <button class="key--operator" data-action="subtraction">-</button>
+        <button class="key--operator" data-action="multiply">&times;</button>
+        <button class="key--operator" data-action="divide">/</button>
+        <button>7</button>
+        <button>8</button>
+        <button>9</button>
+        <button>4</button>
+        <button>5</button>
+        <button>6</button>
+        <button>1</button>
+        <button>2</button>
+        <button>3</button>
+        <button>0</button>
+        <button data-action="decimal">.</button>
+        <button data-action="clear">AC</button>
+        <button class="key--equal" data-action="calculate">=</button>
+      </div>
+    </section>
+    <script>
+      const calculator = document.querySelector(".calc");
+      const keys = calculator.querySelector(".calculator_keys");
+      const display = calculator.querySelector(".calculator_display");
+
+      keys.addEventListener("click", (e) => {
+        if (e.target.matches("button")) {
+          const key = e.target; //contains specific button e.g <button>1</button>
+          const action = key.dataset.action; //refers to data-action of specific key that contain attribute of data-action
+          const keyContent = key.textContent; //the text value of a button
+          const displayedNum = display.value; //contains the value of input field
+          const previousKeyType = calculator.dataset.previousKeyType;
+          if (!action /*if keys does not contain data-action*/) {
+            if (displayedNum === "0" || previousKeyType === "operator") {
+              display.value = keyContent;
+            } else {
+              display.value = displayedNum + keyContent;
+            }
+            calculator.dataset.previousKeyType = "number"; //set teh custom atrribute to parent
+            return;
+          }
+
+          Array.from(key.parentNode.children).forEach((k) => k.classList.remove("is-pressed"));
+          if (action === "addition" || action === "subtraction" || action === "multiply" || action === "divide") {
+            key.classList.add("is-pressed");
+            calculator.dataset.previousKeyType = "operator";
+            calculator.dataset.firstValue = displayedNum;
+            calculator.dataset.operator = action;
+            return;
+          }
+
+          if (action === "decimal") {
+            if (!displayedNum.includes(".")) {
+              display.value = displayedNum + ".";
+            }
+            return;
+          }
+
+          if (action === "clear") {
+            display.value = "0";
+            return;
+          }
+
+          const calculate = (n1, o, n2) => {
+            let result = "";
+
+            if (o === "addition") {
+              return (result = parseFloat(n1) + parseFloat(n2));
+            } else if (o === "subtraction") {
+              return (result = parseFloat(n1) - parseFloat(n2));
+            } else if (o === "multiply") {
+              return (result = parseFloat(n1) * parseFloat(n2));
+            } else if (o === "divide") {
+              return (result = parseFloat(n1) / parseFloat(n2));
+            }
+            return result;
+          };
+
+          if (action === "calculate") {
+            const firstValue = calculator.dataset.firstValue;
+            const operator = calculator.dataset.operator;
+            const secondValue = displayedNum;
+
+            display.value = calculate(firstValue, operator, secondValue);
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
