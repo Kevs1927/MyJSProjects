@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Score Keeper</title>
+  </head>
+  <style>
+    html,
+    body {
+      display: flex;
+      justify-content: center;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      border: 1px solid black;
+      height: 100%;
+    }
+    small {
+      border: 1px solid gray;
+      padding: 5px;
+    }
+    div {
+      padding: 5px;
+    }
+    input {
+      width: 35px;
+      border-radius: 10px;
+      border: none;
+      border: 1px solid black;
+      padding: 2px;
+    }
+    button {
+      padding: 10px;
+      width: 120px;
+      border: none;
+      color: white;
+    }
+    button:nth-of-type(1) {
+      background-color: rgb(12, 141, 141);
+    }
+    button:nth-of-type(2) {
+      background-color: blue;
+    }
+    button:nth-of-type(3) {
+      background-color: red;
+    }
+  </style>
+  <body>
+    <section class="container">
+      <img
+        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRmDSraW9yPKIP65-hsYrsR9tLnLMavN8h0PA&s"
+        alt="table tennis"
+      />
+      <small>Simple Table Tennis Score Keeper</small>
+      <div>
+        <h1><span id="p1Score">0</span> to <span id="p2Score">0</span></h1>
+        <p>Use the button below to keep score.</p>
+        <div>
+          <label for="maxnum"><b>Playing To:</b></label>
+          <input type="number" name="maxnum" value="5" required />
+        </div>
+        <div class="btns">
+          <button id="p1Btn">+1 Player One</button>
+          <button id="p2Btn">+1 Player Two</button>
+          <button id="res">Reset</button>
+        </div>
+      </div>
+    </section>
+    <script>
+      //access all the elements using id, class, or first match
+      const p1 = document.getElementById("p1Score");
+      const p2 = document.getElementById("p2Score");
+      const container = document.querySelector(".btns");
+      const winningScoreInput = document.querySelector("input");
+      const allBtn = document.querySelectorAll("button");
+
+      let p1Score = 0; // set score to 0
+      let p2Score = 0; // set score to 0
+      let isGameOver = false; // flag to mark if game over
+      let winningScore = parseInt(winningScoreInput.value); // parseInt convert string value into an number in the winningScoreInput. .value extracts tha value on input
+
+      //will reset if the user changet the winningScore during mid game
+      winningScoreInput.addEventListener("change", function () {
+        winningScore = parseInt(this.value); // this.value gets the current input value inside the event listener. whenever the user changes the input, read the new value and convert it to a number, because input values are always strings
+        resetGame(); // called the reset game after
+      });
+      container.addEventListener("click", (e) => {
+        if (e.target.tagName !== "BUTTON") return;
+
+        const btnId = e.target.id; //store the id if user click the exact element
+
+        if (btnId === "p1Btn" && !isGameOver) {
+          p1Score++; //increment if user click p1button
+          updateScore(p1, p1Score, p2);
+        } else if (btnId === "p2Btn" && !isGameOver) {
+          p2Score++; //incremenet if user click p2button
+          updateScore(p2, p2Score, p1);
+        } else if (btnId === "res") {
+          resetGame();
+        }
+      });
+
+      function updateScore(display, score, opponentScore) {
+        display.textContent = score; //hold the player html.textContent to update the score and display it.
+        if (score === winningScore) {
+          //check if the score/display is = winningScore
+          isGameOver = true; //if yes the game is over
+          display.style.color = "green"; //player 1 color
+          opponentScore.style.color = "red"; //player 2 color
+          allBtn.forEach((b) => {
+            //iterate to all button
+            b.disabled = true; //set the button to disabled since the game is over
+            b.style.backgroundColor = "gray"; //set also the color to gray indicating disabled
+            if (b.id === "res") {
+              // keep the reset button enabled
+              b.style.backgroundColor = "";
+              b.disabled = false;
+            }
+          });
+        }
+      }
+      function resetGame() {
+        //set all the variable to default
+        isGameOver = false;
+        p1Score = 0;
+        p2Score = 0;
+        p1.textContent = 0;
+        p2.textContent = 0;
+        p1.style.color = "black";
+        p2.style.color = "black";
+        allBtn.forEach((b) => {
+          //enable the button if the game is reset.
+          b.disabled = false;
+          b.style.backgroundColor = "";
+        });
+      }
+    </script>
+  </body>
+</html>
